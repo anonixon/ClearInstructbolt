@@ -21,17 +21,41 @@ export const ROUTES = {
   // Public routes
   HOME: '/',
   LOGIN: '/login',
-  TEACHERS: '/teachers',
-  PARENTS: '/parents',
   INSTITUTIONS: '/institutions',
   FEATURES: '/features',
   DEMO: '/demo',
 
-  // Protected routes
-  DASHBOARD: '/dashboard',
-  TEACHER_DASHBOARD: '/teacher',
-  PARENT_PORTAL: '/parent-portal',
-  HEADTEACHER_DASHBOARD: '/headteacher',
+  // Auth routes
+  DASHBOARD_SELECTION: '/dashboard-selection',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
+  VERIFY_EMAIL: '/verify-email',
+  TWO_FACTOR_SETUP: '/2fa-setup',
+  TWO_FACTOR_VERIFY: '/2fa-verify',
+  OTP_VERIFY: '/otp-verify',
+
+  // School Admin routes
+  SCHOOL_ADMIN_REGISTER: '/school-admin/register',
+  SCHOOL_ADMIN_DASHBOARD: '/school-admin/dashboard',
+  SCHOOL_ADMIN_INVITE: '/school-admin/invite',
+  SCHOOL_ADMIN_SETTINGS: '/school-admin/settings',
+
+  // Teacher routes
+  TEACHER_REGISTER: '/teacher/register',
+  TEACHER_DASHBOARD: '/teacher/dashboard',
+  TEACHER_CLASSROOM: '/teacher/classroom',
+  TEACHER_REPORTS: '/teacher/reports',
+
+  // Parent routes
+  PARENT_REGISTER: '/parent/register',
+  PARENT_DASHBOARD: '/parent/dashboard',
+  PARENT_PROGRESS: '/parent/progress',
+  PARENT_MESSAGING: '/parent/messaging',
+
+  // Student routes
+  STUDENT_REGISTER: '/student/register',
+  REGISTER_SUCCESS: '/register/success',
+  STUDENT_DASHBOARD: '/student/dashboard',
 };
 
 /**
@@ -43,12 +67,39 @@ export const API_ENDPOINTS = {
     REGISTER: '/auth/register',
     LOGOUT: '/auth/logout',
     REFRESH_TOKEN: '/auth/refresh-token',
+    VERIFY_EMAIL: '/auth/verify-email',
+    RESEND_VERIFICATION: '/auth/resend-verification',
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    RESET_PASSWORD: '/auth/reset-password',
+    TWO_FACTOR_SETUP: '/auth/2fa/setup',
+    TWO_FACTOR_VERIFY: '/auth/2fa/verify',
+    OTP_VERIFY: '/auth/otp/verify',
+    OTP_SEND: '/auth/otp/send'
+  },
+  SCHOOL: {
+    REGISTER: '/school/register',
+    INVITE_TEACHER: '/school/invite/teacher',
+    INVITE_PARENT: '/school/invite/parent',
+    SETTINGS: '/school/settings',
+    REPORTS: '/school/reports'
+  },
+  TEACHER: {
+    REGISTER: '/teacher/register',
+    CLASSROOM: '/teacher/classroom',
+    STUDENTS: '/teacher/students',
+    REPORTS: '/teacher/reports'
+  },
+  PARENT: {
+    REGISTER: '/parent/register',
+    CHILD_PROGRESS: '/parent/child/progress',
+    MESSAGING: '/parent/messaging'
   },
   USERS: {
     PROFILE: '/users/profile',
     UPDATE_PROFILE: '/users/profile/update',
     CHANGE_PASSWORD: '/users/profile/change-password',
-  },
+    PERMISSIONS: '/users/permissions'
+  }
 };
 
 /**

@@ -16,11 +16,22 @@ interface User {
   email: string;
 }
 
-const AuthContext = createContext<{
+interface Credentials {
+  email: string;
+  password: string;
+}
+
+interface AuthContextType {
   user: User | null;
   login: (credentials: Credentials) => Promise<void>;
   logout: () => void;
-}>({});
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  login: async () => {},
+  logout: () => {},
+});
 
 const ParentsLanding = () => {
   const [heroRef, heroInView] = useInView({

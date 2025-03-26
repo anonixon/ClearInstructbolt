@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sun } from 'lucide-react';
+import { Menu, X, Sun, Building2, GraduationCap, Users } from 'lucide-react';
+import { ROUTES } from '../config/constants';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const navigation = [
-    { name: 'For Teachers', href: '/teachers' },
-    { name: 'For Parents', href: '/parents' },
-    { name: 'For Schools & Colleges', href: '/institutions' },
+    { name: 'For Schools & Colleges', href: ROUTES.INSTITUTIONS, icon: Building2 },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -45,12 +46,29 @@ const Navbar = () => {
             <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
               <Sun className="w-5 h-5" />
             </button>
-            <Link
-              to="/login"
-              className="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
-            >
-              Log in
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-600">
+                  {user.role === 'school_admin' && <Building2 className="w-4 h-4 inline mr-1" />}
+                  {user.role === 'teacher' && <GraduationCap className="w-4 h-4 inline mr-1" />}
+                  {user.role === 'parent' && <Users className="w-4 h-4 inline mr-1" />}
+                  {user.email}
+                </span>
+                <button
+                  onClick={logout}
+                  className="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                to={ROUTES.DASHBOARD_SELECTION}
+                className="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
+              >
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -87,13 +105,33 @@ const Navbar = () => {
               <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
                 <Sun className="w-5 h-5" />
               </button>
-              <Link
-                to="/login"
-                onClick={() => setIsOpen(false)}
-                className="text-base font-medium text-gray-900 hover:text-gray-600"
-              >
-                Log in
-              </Link>
+              {user ? (
+                <>
+                  <span className="text-base text-gray-600">
+                    {user.role === 'school_admin' && <Building2 className="w-4 h-4 inline mr-1" />}
+                    {user.role === 'teacher' && <GraduationCap className="w-4 h-4 inline mr-1" />}
+                    {user.role === 'parent' && <Users className="w-4 h-4 inline mr-1" />}
+                    {user.email}
+                  </span>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsOpen(false);
+                    }}
+                    className="text-base font-medium text-gray-900 hover:text-gray-600"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to={ROUTES.DASHBOARD_SELECTION}
+                  onClick={() => setIsOpen(false)}
+                  className="text-base font-medium text-gray-900 hover:text-gray-600"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         </div>

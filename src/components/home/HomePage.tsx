@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Clock, BarChart2 } from 'lucide-react';
+import { Users, Clock, BarChart2, GraduationCap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const HomePage: React.FC = () => {
@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
               >
                 Book a Demo
               </Link>
-            <Link
+              <Link
                 to="/features"
                 className="inline-flex items-center px-6 py-3 text-base font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
@@ -36,51 +36,98 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* Right Column - Feature Cards */}
-          <div className="flex-1 w-full max-w-xl space-y-6">
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <svg className="w-6 h-6 text-purple-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 8V12L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
-                  </svg>
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Users className="w-6 h-6 text-blue-600" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Time-Saving Management</h3>
-                  <p className="text-gray-600">Our education management solutions cut down on admin and free up teacher's time, so they can focus on their students.</p>
-                </div>
+                <h3 className="text-lg font-semibold text-gray-900">For Teachers</h3>
               </div>
-            </div>
+              <p className="text-gray-600 mb-4">
+                Streamline your workflow and focus on what matters most - teaching.
+              </p>
+            <Link
+              to="/teachers"
+                className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
+              >
+                Learn more <span className="ml-1">→</span>
+              </Link>
+            </motion.div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-orange-100 rounded-lg">
-                  <svg className="w-6 h-6 text-orange-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15" stroke="currentColor" strokeWidth="2"/>
-                    <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5C15 6.10457 14.1046 7 13 7H11C9.89543 7 9 6.10457 9 5Z" stroke="currentColor" strokeWidth="2"/>
-                  </svg>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Clock className="w-6 h-6 text-green-600" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Insightful Reporting</h3>
-                  <p className="text-gray-600">Intuitive reporting features equip leadership with the kind of key insights they need to better support the success of students.</p>
-                </div>
+                <h3 className="text-lg font-semibold text-gray-900">For Parents</h3>
               </div>
-            </div>
+              <p className="text-gray-600 mb-4">
+                Stay connected with your child's education journey in real-time.
+              </p>
+              <Link
+                to="/parents"
+                className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
+              >
+                Learn more <span className="ml-1">→</span>
+              </Link>
+            </motion.div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <svg className="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17 8C17 10.7614 14.7614 13 12 13C9.23858 13 7 10.7614 7 8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8Z" stroke="currentColor" strokeWidth="2"/>
-                    <path d="M3 21C3 17.134 7.02944 14 12 14C16.9706 14 21 17.134 21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <BarChart2 className="w-6 h-6 text-purple-600" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">User-Friendly Interface</h3>
-                  <p className="text-gray-600">User-friendly software keeps your parent and user community engaged, so you can work together to achieve the best outcomes for pupils.</p>
-                </div>
+                <h3 className="text-lg font-semibold text-gray-900">For Schools</h3>
               </div>
-            </div>
+              <p className="text-gray-600 mb-4">
+                Comprehensive school management and analytics platform.
+              </p>
+              <Link
+                to="/institutions"
+                className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
+              >
+                Learn more <span className="ml-1">→</span>
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <GraduationCap className="w-6 h-6 text-yellow-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">For Students</h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Access your assignments, grades, and track your progress.
+              </p>
+              <Link
+                to="/students"
+                className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
+              >
+                Learn more <span className="ml-1">→</span>
+              </Link>
+            </motion.div>
           </div>
         </div>
       </div>

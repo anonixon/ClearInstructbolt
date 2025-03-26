@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sidebar-width: 280px;
+}
+
+body {
+  @apply bg-black text-gray-200;
+}
+
+.sidebar-link {
+  @apply flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors;
+}
+
+.sidebar-link.active {
+  @apply bg-gray-800/50 text-white;
+}
+
+.stat-card {
+  @apply bg-gray-800/50 rounded-xl p-6 flex flex-col items-center justify-center;
+}
+
+.stat-value {
+  @apply text-4xl font-bold;
+}
+
+.stat-label {
+  @apply text-sm text-gray-400 mt-2;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-600;
+}

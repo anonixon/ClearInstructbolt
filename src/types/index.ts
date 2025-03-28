@@ -26,14 +26,13 @@ export interface Student {
 
 export interface Teacher {
   id: string;
-  user_id: string;
-  school_id: string;
-  first_name: string;
-  last_name: string;
-  subjects: string[];
-  classes: string[];
-  created_at: string;
-  updated_at: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  schoolName?: string;
+  userType: 'teacher';
+  grade?: string;
 }
 
 export interface Parent {
@@ -78,11 +77,22 @@ export interface StudentMetrics {
 
 export interface TeacherMetrics {
   total_students: number;
-  average_attendance: number;
-  average_grades: number;
+  active_classes: number;
   pending_assignments: number;
-  upcoming_events: number;
-  recent_submissions: number;
+  average_performance: number;
+  upcoming_events: Array<{
+    id: string;
+    title: string;
+    date: string;
+    type: string;
+  }>;
+  recent_submissions: Array<{
+    id: string;
+    student_name: string;
+    assignment_title: string;
+    submitted_at: string;
+    grade?: number;
+  }>;
 }
 
 export interface WellbeingMetrics {

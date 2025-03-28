@@ -1,47 +1,17 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { StudentProgress } from '../components/teacher/dashboard/StudentProgress';
-import { AttendanceManager } from '../components/teacher/dashboard/AttendanceManager';
-import { User } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import TeacherDashboard from '../components/teacher/dashboard/TeacherDashboard';
+import { Navigate } from 'react-router-dom';
+import { ROUTES } from '../lib/constants/routes';
 
-interface TeacherDashboardProps {
-  currentUser: User;
-}
+const TeacherDashboardPage: React.FC = () => {
+  const { user } = useAuth();
+  
+  if (!user?.id) {
+    return <Navigate to={ROUTES.PUBLIC.LOGIN} replace />;
+  }
 
-const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ currentUser }) => {
-  return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Welcome, {currentUser.first_name}!</h1>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <StudentProgress className="col-span-1" />
-        <AttendanceManager className="col-span-1" />
-      </div>
-
-      <div className="grid grid-cols-1 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Classes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">No upcoming classes scheduled.</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">No recent activity to display.</p>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+  return <TeacherDashboard teacherId={user.id} />;
 };
 
-export { TeacherDashboard };
-export type { TeacherDashboardProps }; 
+export default TeacherDashboardPage; 

@@ -9,7 +9,7 @@ import { Button } from '@components/shared/ui/button';
 import { Table } from '@components/shared/ui/table';
 import { Bell, BookOpen, Calendar, MessageSquare, TrendingUp, GraduationCap, Users } from 'lucide-react';
 import { useStore } from '@store/useStore';
-import { Teacher, TeacherMetrics } from '@types/teacher';
+import type { Teacher, TeacherMetrics } from '../../../../types';
 
 type Student = Database['public']['Tables']['students']['Row'];
 type Assignment = Database['public']['Tables']['assignments']['Row'];
@@ -20,18 +20,27 @@ interface TeacherDashboardProps {
   teacherId: string;
 }
 
-const TeacherDashboard = () => {
+interface Notification {
+  id: string;
+  message: string;
+  timestamp: string;
+}
+
+interface AssignmentColumn {
+  key: keyof Assignment;
+  header: string;
+  sortable?: boolean;
+  render?: (assignment: Assignment) => React.ReactNode;
+}
+
+const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ teacherId }) => {
   const { user } = useStore();
   const [metrics, setMetrics] = useState<TeacherMetrics | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [notifications, setNotifications] = useState<Array<{
-    id: string;
-    message: string;
-    timestamp: string;
-  }>>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [sortKey, setSortKey] = useState<keyof Assignment>('due_date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -39,7 +48,7 @@ const TeacherDashboard = () => {
   useOptimizedSubscription({
     table: 'teacher_students',
     event: '*',
-    filter: `teacher_id=eq.${user?.id}`,
+    filter: `teacher_id=eq.${teacherId}`,
     callback: async (payload) => {
       if (payload.eventType === 'INSERT') {
         const teacherStudent = payload.new as TeacherStudent;
@@ -65,7 +74,7 @@ const TeacherDashboard = () => {
   useOptimizedSubscription({
     table: 'assignments',
     event: '*',
-    filter: `teacher=eq.${user?.id}`,
+    filter: `teacher_id=eq.${teacherId}`,
     callback: (payload) => {
       if (payload.eventType === 'INSERT') {
         setAssignments(prev => [...prev, payload.new as Assignment]);
@@ -89,7 +98,7 @@ const TeacherDashboard = () => {
   useOptimizedSubscription({
     table: 'messages',
     event: 'INSERT',
-    filter: `recipient_id=eq.${user?.id}`,
+    filter: `recipient_id=eq.${teacherId}`,
     callback: async (payload) => {
       const newMessage = payload.new as Message;
       
@@ -116,7 +125,7 @@ const TeacherDashboard = () => {
         const { data: metricsData, error: metricsError } = await supabase
           .from('teacher_metrics')
           .select('*')
-          .eq('teacher_id', user?.id)
+          .eq('teacher_id', teacherId)
           .single();
 
         if (metricsError) throw metricsError;
@@ -126,7 +135,7 @@ const TeacherDashboard = () => {
         const { data: assignmentsData, error: assignmentsError } = await supabase
           .from('assignments')
           .select('*')
-          .eq('teacher_id', user?.id)
+          .eq('teacher_id', teacherId)
           .order('created_at', { ascending: false });
 
         if (assignmentsError) throw assignmentsError;
@@ -139,14 +148,14 @@ const TeacherDashboard = () => {
     };
 
     fetchData();
-  }, [user?.id]);
+  }, [teacherId]);
 
   const handleSort = (key: keyof Assignment, direction: 'asc' | 'desc') => {
     setSortKey(key);
     setSortDirection(direction);
   };
 
-  const assignmentColumns = [
+  const assignmentColumns: AssignmentColumn[] = [
     { key: 'title', header: 'Title', sortable: true },
     { key: 'subject', header: 'Subject', sortable: true },
     { key: 'due_date', header: 'Due Date', sortable: true },
@@ -183,90 +192,34 @@ const TeacherDashboard = () => {
     .slice(0, 3);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Teacher Dashboard</h1>
-      
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Teacher Dashboard</h1>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Total Students</CardTitle>
+            <CardTitle>Students</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{metrics?.total_students || 0}</p>
+            <p className="text-muted-foreground">
+              {students.length} students in your class
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Active Classes</CardTitle>
+            <CardTitle>Assignments</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{metrics?.active_classes || 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Pending Assignments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{metrics?.pending_assignments || 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Average Performance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Progress value={metrics?.average_performance || 0} />
-              <p className="text-sm text-muted-foreground">
-                {metrics?.average_performance || 0}%
-              </p>
-            </div>
+            <p className="text-muted-foreground">
+              {assignments.length} active assignments
+            </p>
           </CardContent>
         </Card>
       </div>
-
-      {/* Recent Assignments */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Assignments</CardTitle>
-          <Button>Create New Assignment</Button>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Due Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assignments.map((assignment) => (
-                <tr key={assignment.id}>
-                  <td>{assignment.title}</td>
-                  <td>{new Date(assignment.due_date).toLocaleDateString()}</td>
-                  <td>
-                    <Badge variant={assignment.status === 'active' ? 'default' : 'secondary'}>
-                      {assignment.status}
-                    </Badge>
-                  </td>
-                  <td>
-                    <Button variant="outline" size="sm">
-                      View Details
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   );
 };

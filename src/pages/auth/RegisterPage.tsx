@@ -7,7 +7,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { ROUTES } from '../../lib/constants/routes';
 
-export const RegisterPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const [formData, setFormData] = useState({
@@ -164,4 +164,6 @@ export const RegisterPage: React.FC = () => {
       </Card>
     </div>
   );
-}; 
+};
+
+export default RegisterPage; 

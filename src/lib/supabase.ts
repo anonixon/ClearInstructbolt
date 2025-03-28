@@ -21,7 +21,16 @@ export interface RealtimeSubscriptionOptions {
   table: string;
   event: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
   filter?: string;
-  callback: (payload: any) => void;
+  callback: (payload: RealtimePayload) => void;
+}
+
+interface RealtimePayload {
+  new: Record<string, any>;
+  old: Record<string, any>;
+  eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+  schema: string;
+  table: string;
+  commit_timestamp: string;
 }
 
 // Hook for managing real-time subscriptions
@@ -29,14 +38,14 @@ export const useRealtimeSubscription = (options: RealtimeSubscriptionOptions) =>
   const channel = supabase
     .channel(`${options.table}_changes`)
     .on(
-      'postgres_changes',
+      'postgres_changes' as any,
       {
         event: options.event,
         schema: 'public',
         table: options.table,
         filter: options.filter
       },
-      (payload) => {
+      (payload: RealtimePayload) => {
         options.callback(payload);
       }
     )
@@ -162,16 +171,6 @@ export const createEdgeFunction = async (
     }
   };
 };
-
-// Add after the existing types
-interface RealtimePayload {
-  new: Record<string, any>;
-  old: Record<string, any>;
-  eventType: 'INSERT' | 'UPDATE' | 'DELETE';
-  schema: string;
-  table: string;
-  commit_timestamp: string;
-}
 
 // Update the SubscriptionOptions interface
 interface SubscriptionOptions {

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { MessageSquare, Bell, Download, Search, Paperclip, Send, Phone, Mail } from 'lucide-react';
+import { useState } from 'react';
+import { Search } from 'lucide-react';
 import TeacherMessages from './communication/TeacherMessages';
 import SchoolAnnouncements from './communication/SchoolAnnouncements';
 import PSHEUpdates from './communication/PSHEUpdates';

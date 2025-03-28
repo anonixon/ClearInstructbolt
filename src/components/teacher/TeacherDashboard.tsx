@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { Calendar, Users, BookOpen, MessageSquare, FileText, Bell, Search } from 'lucide-react';
 import ClassOverview from './dashboard/ClassOverview';
-import StudentProgress from './dashboard/StudentProgress';
-import AttendanceManager from './dashboard/AttendanceManager';
+import { StudentProgress } from './dashboard/StudentProgress';
+import { AttendanceManager } from './dashboard/AttendanceManager';
 import { AssignmentManager } from './dashboard/AssignmentManager';
 import { ParentCommunication } from './dashboard/ParentCommunication';
 import { ResourceManager } from './dashboard/ResourceManager';
 import { TeacherCalendar } from './dashboard/TeacherCalendar';
 import { NotificationPanel } from './dashboard/NotificationPanel';
+import { User } from '../../types';
 
-const TeacherDashboard = () => {
+interface TeacherDashboardProps {
+  currentUser: User;
+}
+
+const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ currentUser }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -128,4 +133,5 @@ const TabButton: React.FC<TabButtonProps> = ({ icon, label, active, onClick }) =
   </button>
 );
 
-export default TeacherDashboard; 
+export { TeacherDashboard };
+export type { TeacherDashboardProps }; 

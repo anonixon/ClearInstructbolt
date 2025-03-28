@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Bell, Search } from 'lucide-react';
 import ParentSidebar from './ParentSidebar';
 import ChildOverview from './dashboard/ChildOverview';
@@ -7,17 +7,7 @@ import Attendance from './dashboard/Attendance';
 import Behavior from './dashboard/Behavior';
 import Communication from './dashboard/Communication';
 import Homework from './dashboard/Homework';
-import CareerPlanning from './dashboard/CareerPlanning';
-import Settings from './dashboard/Settings';
 import NotificationPanel from './dashboard/NotificationPanel';
-import { useOptimizedSubscription, supabase } from '@lib/supabase';
-import { Database } from '@lib/database.types';
-import { Card, CardContent, CardHeader, CardTitle } from '@components/shared/ui/card';
-import { Progress } from '@components/shared/ui/progress';
-import { Badge } from '@components/shared/ui/badge';
-import { Alert, AlertDescription } from '@components/shared/ui/alert';
-import { Button } from '@components/shared/ui/button';
-import { Table } from '@components/shared/ui/table';
 
 const ParentDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -38,10 +28,6 @@ const ParentDashboard = () => {
         return <Communication />;
       case 'homework':
         return <Homework />;
-      case 'career':
-        return <CareerPlanning />;
-      case 'settings':
-        return <Settings />;
       default:
         return <ChildOverview />;
     }

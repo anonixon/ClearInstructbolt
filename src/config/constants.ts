@@ -74,7 +74,9 @@ export const API_ENDPOINTS = {
     TWO_FACTOR_SETUP: '/auth/2fa/setup',
     TWO_FACTOR_VERIFY: '/auth/2fa/verify',
     OTP_VERIFY: '/auth/otp/verify',
-    OTP_SEND: '/auth/otp/send'
+    OTP_SEND: '/auth/otp/send',
+    GOOGLE_LOGIN: '/auth/google',
+    MICROSOFT_LOGIN: '/auth/microsoft'
   },
   SCHOOL: {
     REGISTER: '/school/register',

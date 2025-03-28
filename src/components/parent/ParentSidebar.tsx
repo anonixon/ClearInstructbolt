@@ -1,71 +1,69 @@
-import React, { useState } from 'react';
-import { User, BookOpen, Calendar, Award, MessageSquare, BookMarked, Compass, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { BookOpen, Calendar, Award, MessageSquare, BookMarked, Compass, Settings, LogOut, Home } from 'lucide-react';
 import { useStore } from '../../store/useStore';
+import { ROUTES } from '../../lib/constants/routes';
+import { Link, useLocation } from 'react-router-dom';
+import { Parent } from '../../types';
 
-const ParentSidebar = () => {
+interface ParentSidebarProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+}
+
+const ParentSidebar: React.FC<ParentSidebarProps> = ({ activeTab, onTabChange }) => {
   const [isChildrenOpen, setIsChildrenOpen] = useState(false);
-  const currentParent = useStore((state) => state.currentParent);
-  const selectedChild = useStore((state) => state.getSelectedChild());
-  const setSelectedChild = useStore((state) => state.setSelectedChild);
+  const currentParent = useStore((state) => state.currentParent) as Parent | null;
+  const location = useLocation();
 
-  const handleChildSelect = (childId: string) => {
-    setSelectedChild(childId);
-    setIsChildrenOpen(false);
-  };
+  const navigationItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Home, path: ROUTES.DASHBOARD.PARENT_DASHBOARD },
+    { id: 'academic', label: 'Academic Reports', icon: BookOpen, path: '/parent/academic' },
+    { id: 'attendance', label: 'Attendance', icon: Calendar, path: '/parent/attendance' },
+    { id: 'behavior', label: 'Behavior', icon: Award, path: '/parent/behavior' },
+    { id: 'communication', label: 'Communication', icon: MessageSquare, path: '/parent/communication' },
+    { id: 'homework', label: 'Homework', icon: BookMarked, path: '/parent/homework' },
+    { id: 'activities', label: 'Activities', icon: Compass, path: '/parent/activities' },
+    { id: 'settings', label: 'Settings', icon: Settings, path: '/parent/settings' },
+  ];
 
   return (
-    <div className="fixed left-0 top-0 w-[var(--sidebar-width)] h-screen bg-gray-900 p-4 flex flex-col">
-      <div className="mb-8">
-        <div className="relative">
-          <button
-            onClick={() => setIsChildrenOpen(!isChildrenOpen)}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800/50 transition-colors"
-          >
-            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm">
-              {selectedChild?.name.split(' ').map(n => n[0]).join('')}
-            </div>
-            <div className="flex-1 text-left">
-              <h1 className="text-white font-medium">{selectedChild?.name}</h1>
-              <p className="text-sm text-gray-400">{selectedChild?.yearGroup}</p>
-            </div>
-            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isChildrenOpen ? 'rotate-180' : ''}`} />
-          </button>
+    <div className="w-64 bg-white h-screen shadow-md fixed left-0 top-0">
+      <div className="p-4 border-b">
+        <h2 className="text-xl font-semibold">Parent Portal</h2>
+        {currentParent && (
+          <p className="text-sm text-gray-600">
+            {currentParent.first_name} {currentParent.last_name}
+          </p>
+        )}
+      </div>
 
-          {isChildrenOpen && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800 rounded-lg py-2 shadow-xl z-50">
-              {currentParent.children.map((child) => (
-                <button
-                  key={child.id}
-                  onClick={() => handleChildSelect(child.id)}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700/50 transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm">
-                    {child.name.split(' ').map(n => n[0]).join('')}
-                  </div>
-                  <div className="text-left">
-                    <div className="text-white font-medium">{child.name}</div>
-                    <div className="text-sm text-gray-400">{child.yearGroup}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
+      <div className="p-4">
+        <div className="space-y-2">
+          {navigationItems.map((item) => (
+            <Link
+              key={item.id}
+              to={item.path}
+              className={`flex items-center space-x-3 p-2 rounded-lg transition-colors ${
+                location.pathname === item.path
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+              onClick={() => onTabChange(item.id)}
+            >
+              <item.icon className="w-5 h-5" />
+              <span>{item.label}</span>
+            </Link>
+          ))}
         </div>
       </div>
-      
-      <nav className="flex-1 space-y-1">
-        <NavItem icon={<User />} label="Child Overview" active />
-        <NavItem icon={<BookOpen />} label="Academic Reports" />
-        <NavItem icon={<Calendar />} label="Attendance" />
-        <NavItem icon={<Award />} label="Behavior" />
-        <NavItem icon={<MessageSquare />} label="Communication" />
-        <NavItem icon={<BookMarked />} label="Homework" />
-        <NavItem icon={<Compass />} label="Career Planning" />
-        <NavItem icon={<Settings />} label="Settings" />
-      </nav>
 
-      <div className="mt-auto pt-4 border-t border-gray-800">
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors">
+      <div className="absolute bottom-0 w-full p-4 border-t">
+        <button
+          className="flex items-center space-x-3 text-red-600 hover:text-red-700"
+          onClick={() => {
+            window.location.href = ROUTES.AUTH.LOGOUT;
+          }}
+        >
           <LogOut className="w-5 h-5" />
           <span>Logout</span>
         </button>
@@ -73,26 +71,5 @@ const ParentSidebar = () => {
     </div>
   );
 };
-
-const NavItem = ({ 
-  icon, 
-  label, 
-  active = false 
-}: { 
-  icon: React.ReactNode;
-  label: string;
-  active?: boolean;
-}) => (
-  <button
-    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-      active 
-        ? 'bg-gray-800/50 text-white' 
-        : 'text-gray-400 hover:text-white hover:bg-gray-800/30'
-    }`}
-  >
-    {icon}
-    <span>{label}</span>
-  </button>
-);
 
 export default ParentSidebar;

@@ -1,10 +1,11 @@
 import { API_ENDPOINTS } from '../config/constants';
-import { IAuthCredentials, IAuthResponse } from '../types/common';
+import { IAuthCredentials, IAuthResponse } from '../types/auth';
+import { User } from '../types';
 
 class AuthService {
   private static instance: AuthService;
   private token: string | null = localStorage.getItem('token');
-  private user: any | null = JSON.parse(localStorage.getItem('user') || 'null');
+  private user: User | null = JSON.parse(localStorage.getItem('user') || 'null');
 
   private constructor() {}
 
@@ -37,7 +38,7 @@ class AuthService {
     }
   }
 
-  public async register(userData: any): Promise<IAuthResponse> {
+  public async register(userData: Partial<User>): Promise<IAuthResponse> {
     try {
       const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
         method: 'POST',
@@ -134,7 +135,7 @@ class AuthService {
   public async loginWithGoogle(): Promise<IAuthResponse> {
     try {
       const response = await fetch(API_ENDPOINTS.AUTH.GOOGLE_LOGIN, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -155,7 +156,7 @@ class AuthService {
   public async loginWithMicrosoft(): Promise<IAuthResponse> {
     try {
       const response = await fetch(API_ENDPOINTS.AUTH.MICROSOFT_LOGIN, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -191,7 +192,7 @@ class AuthService {
     return !!this.token;
   }
 
-  public getCurrentUser(): any | null {
+  public getCurrentUser(): User | null {
     return this.user;
   }
 

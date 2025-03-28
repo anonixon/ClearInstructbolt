@@ -7,16 +7,25 @@ export const ROUTES = {
     REGISTER_SUCCESS: '/register-success',
   },
   REGISTRATION: {
-    HEADTEACHER: '/register/headteacher',
-    TEACHER: '/register/teacher',
-    STUDENT: '/register/student',
     PARENT: '/register/parent',
+    STUDENT: '/register/student',
+    TEACHER: '/register/teacher',
+    SCHOOL_ADMIN: '/register/school-admin',
+    HEADTEACHER: '/register/headteacher',
   },
   DASHBOARD: {
-    SELECTION: '/dashboard/selection',
-    TEACHER: '/dashboard/teacher',
-    PARENT: '/dashboard/parent',
-    STUDENT: '/dashboard/student',
+    PARENT_DASHBOARD: '/dashboard/parent',
+    STUDENT_DASHBOARD: '/dashboard/student',
+    TEACHER_DASHBOARD: '/dashboard/teacher',
+    SCHOOL_ADMIN_DASHBOARD: '/dashboard/school-admin',
+    HEADTEACHER_DASHBOARD: '/dashboard/headteacher',
+  },
+  AUTH: {
+    LOGOUT: '/logout',
+    RESET_PASSWORD: '/reset-password',
+    CHANGE_PASSWORD: '/change-password',
+    FORGOT_PASSWORD: '/forgot-password',
+    VERIFY_EMAIL: '/verify-email',
   },
 } as const;
 

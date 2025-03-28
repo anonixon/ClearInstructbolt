@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Calendar, MessageSquare, BarChart } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { ROUTES } from '../../config/constants';
+import { useAuth } from '@contexts/AuthContext';
+import { ROUTES } from '@lib/constants/routes';
 
 const StudentDashboard: React.FC = () => {
   const { user } = useAuth();

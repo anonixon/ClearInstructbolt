@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GraduationCap } from 'lucide-react';
-import { ROUTES } from '../../config/constants';
+import { ROUTES } from '@lib/constants/routes';
 import { Input, PasswordInput, FormSection } from './shared/FormComponents';
+import { useAuth } from '@contexts/AuthContext';
 
 interface TeacherFormData {
   fullName: string;

@@ -10,6 +10,14 @@ import Homework from './dashboard/Homework';
 import CareerPlanning from './dashboard/CareerPlanning';
 import Settings from './dashboard/Settings';
 import NotificationPanel from './dashboard/NotificationPanel';
+import { useOptimizedSubscription, supabase } from '@lib/supabase';
+import { Database } from '@lib/database.types';
+import { Card, CardContent, CardHeader, CardTitle } from '@components/shared/ui/card';
+import { Progress } from '@components/shared/ui/progress';
+import { Badge } from '@components/shared/ui/badge';
+import { Alert, AlertDescription } from '@components/shared/ui/alert';
+import { Button } from '@components/shared/ui/button';
+import { Table } from '@components/shared/ui/table';
 
 const ParentDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');

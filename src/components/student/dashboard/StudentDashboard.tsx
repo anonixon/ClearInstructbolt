@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useOptimizedSubscription, supabase } from '../../../lib/supabase';
-import { Database } from '../../../lib/database.types';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/shared/ui/card';
-import { Progress } from '../../../components/shared/ui/progress';
-import { Badge } from '../../../components/shared/ui/badge';
-import { Alert, AlertDescription } from '../../../components/shared/ui/alert';
-import { Button } from '../../../components/shared/ui/button';
-import { Table } from '../../../components/shared/ui/table';
+import { useOptimizedSubscription, supabase } from '@lib/supabase';
+import { Database } from '@lib/database.types';
+import { Card, CardContent, CardHeader, CardTitle } from '@components/shared/ui/card';
+import { Progress } from '@components/shared/ui/progress';
+import { Badge } from '@components/shared/ui/badge';
+import { Alert, AlertDescription } from '@components/shared/ui/alert';
+import { Button } from '@components/shared/ui/button';
+import { Table } from '@components/shared/ui/table';
 import { Bell, BookOpen, Calendar, MessageSquare, TrendingUp, GraduationCap, Target, AlertCircle, CheckCircle2, Clock, RefreshCw, Award, FileText, Users, CheckCircle } from 'lucide-react';
-import { useStore } from '../../../store/useStore';
-import { Student, StudentMetrics } from '../../../types/student';
+import { useStore } from '@store/useStore';
+import { Student, StudentMetrics } from '@types/student';
 
 type Assignment = Database['public']['Tables']['assignments']['Row'];
 type Message = Database['public']['Tables']['messages']['Row'];
@@ -75,8 +75,9 @@ interface Activity {
   date: string;
 }
 
-export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId }) => {
-  const [student, setStudent] = useState<Student | null>(null);
+const StudentDashboard = () => {
+  const { user } = useStore();
+  const [metrics, setMetrics] = useState<StudentMetrics | null>(null);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -95,65 +96,43 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
     retryCount: 0
   });
 
-  const studentStore = useStore((state) => state);
-  const attendanceStats = studentStore.getAttendanceStats(new Date());
-  const behaviorStats = studentStore.getBehaviorStats(student?.id || '');
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch student metrics
+        const { data: metricsData, error: metricsError } = await supabase
+          .from('student_metrics')
+          .select('*')
+          .eq('student_id', user?.id)
+          .single();
 
-  // Optimized data fetching with retry logic
-  const fetchData = useCallback(async (retryCount = 0) => {
-    try {
-      setSyncState(prev => ({ ...prev, isSyncing: true, error: null }));
-      
-      // Fetch student data with optimistic updates
-      const { data: studentData, error: studentError } = await supabase
-        .from('students')
-        .select('*')
-        .eq('id', studentId)
-        .single();
+        if (metricsError) throw metricsError;
+        setMetrics(metricsData);
 
-      if (studentError) throw studentError;
+        // Fetch assignments
+        const { data: assignmentsData, error: assignmentsError } = await supabase
+          .from('assignments')
+          .select('*')
+          .eq('student_id', user?.id)
+          .order('due_date', { ascending: true });
 
-      // Fetch assignments with pagination for better performance
-      const { data: assignmentsData, error: assignmentsError } = await supabase
-        .from('assignments')
-        .select('*')
-        .eq('student_id', studentId)
-        .order('due_date', { ascending: true })
-        .limit(50); // Limit initial load for better performance
-
-      if (assignmentsError) throw assignmentsError;
-
-      // Update state with new data
-      setStudent(studentData);
-      setAssignments(assignmentsData || []);
-      setSyncState(prev => ({
-        ...prev,
-        isSyncing: false,
-        lastSyncTime: new Date(),
-        retryCount: 0
-      }));
-    } catch (err) {
-      const error = err instanceof Error ? err.message : 'Failed to fetch data';
-      setSyncState(prev => ({
-        ...prev,
-        isSyncing: false,
-        error,
-        retryCount: retryCount + 1
-      }));
-
-      // Implement exponential backoff for retries
-      if (retryCount < 3) {
-        const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
-        setTimeout(() => fetchData(retryCount + 1), delay);
+        if (assignmentsError) throw assignmentsError;
+        setAssignments(assignmentsData || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
       }
-    }
-  }, [studentId]);
+    };
+
+    fetchData();
+  }, [user?.id]);
 
   // Enhanced subscription with conflict resolution
   useOptimizedSubscription({
     table: 'students',
     event: '*',
-    filter: `id=eq.${studentId}`,
+    filter: `id=eq.${user?.id}`,
     callback: async (payload) => {
       if (payload.eventType === 'UPDATE') {
         const newData = payload.new as Student;
@@ -161,7 +140,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
         
         // Implement conflict resolution
         if (newData.updated_at > (oldData.updated_at || new Date(0))) {
-          setStudent(newData);
+          setMetrics(newData as StudentMetrics);
         } else {
           // If local data is newer, trigger a refresh
           fetchData();
@@ -176,7 +155,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
   useOptimizedSubscription({
     table: 'assignments',
     event: '*',
-    filter: `student_id=eq.${studentId}`,
+    filter: `student_id=eq.${user?.id}`,
     callback: async (payload) => {
       if (payload.eventType === 'INSERT') {
         const newAssignment = payload.new as Assignment;
@@ -210,7 +189,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
   useOptimizedSubscription({
     table: 'messages',
     event: 'INSERT',
-    filter: `recipient_id=eq.${studentId}`,
+    filter: `recipient_id=eq.${user?.id}`,
     callback: async (payload) => {
       try {
         const newMessage = payload.new as Message;
@@ -236,23 +215,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
     }
   });
 
-  // Initial data fetch
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
   // Calculate performance insights
   useEffect(() => {
-    if (!student || assignments.length === 0) return;
+    if (!metrics || assignments.length === 0) return;
 
     const newInsights: PerformanceInsight[] = [];
 
     // Attendance insights
-    if (student.attendance < 90) {
+    if (metrics.attendance_rate < 90) {
       newInsights.push({
         type: 'warning',
         title: 'Attendance Needs Improvement',
-        description: `Your current attendance rate is ${student.attendance}%. Regular attendance is crucial for academic success.`,
+        description: `Your current attendance rate is ${metrics.attendance_rate}%. Regular attendance is crucial for academic success.`,
         action: 'Review your attendance record and make sure to attend all classes.',
         icon: <AlertCircle className="w-5 h-5 text-yellow-500" />
       });
@@ -260,7 +234,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
       newInsights.push({
         type: 'success',
         title: 'Excellent Attendance',
-        description: `You're maintaining a strong attendance rate of ${student.attendance}%. Keep up the good work!`,
+        description: `You're maintaining a strong attendance rate of ${metrics.attendance_rate}%. Keep up the good work!`,
         icon: <CheckCircle2 className="w-5 h-5 text-green-500" />
       });
     }
@@ -335,7 +309,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
     }
 
     setInsights(newInsights);
-  }, [student, assignments]);
+  }, [metrics, assignments]);
 
   const handleSort = (key: keyof Assignment, direction: 'asc' | 'desc') => {
     setSortKey(key);
@@ -363,7 +337,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
   };
 
   if (loading) {
-    return <div>Loading dashboard...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   if (error) {
@@ -374,33 +352,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
     );
   }
 
-  if (!student) {
-    return <div>Student not found</div>;
-  }
-
   const pendingAssignments = assignments.filter(a => a.status !== 'completed');
   const upcomingDueDates = pendingAssignments
     .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
     .slice(0, 3);
 
   // Sample data - replace with real data from your backend
-  const metrics: StudentMetrics = {
-    attendance: {
-      value: '94%',
-      trend: { value: 2, isPositive: true }
-    },
-    academicProgress: {
-      value: 'Above Target',
-      trend: { value: 5, isPositive: true }
-    },
-    behaviorScore: {
-      value: 'Good',
-      trend: { value: 3, isPositive: true }
-    },
-    upcomingEvents: {
-      value: '3',
-      trend: { value: 1, isPositive: false }
-    }
+  const metricsData: StudentMetrics = {
+    attendance_rate: 94,
+    overall_grade: 'A',
+    pending_assignments: 3,
+    average_score: 85
   };
 
   const recentActivities: Activity[] = [
@@ -429,75 +391,56 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Sync Status */}
-      {syncState.isSyncing && (
-        <Alert>
-          <AlertDescription className="flex items-center gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin" />
-            Syncing data...
-          </AlertDescription>
-        </Alert>
-      )}
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Student Dashboard</h1>
       
-      {syncState.error && (
-        <Alert variant="destructive">
-          <AlertDescription className="flex items-center justify-between">
-            <span>{syncState.error}</span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={syncState.isSyncing}
-            >
-              Retry
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Welcome back, {student.name}!
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Here's your overview for today
-          </p>
-        </div>
-      </div>
-
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          icon={<Calendar className="w-6 h-6" />}
-          label="Attendance Rate"
-          value={metrics.attendance.value}
-          trend={metrics.attendance.trend}
-          color="blue"
-        />
-        <MetricCard
-          icon={<BookOpen className="w-6 h-6" />}
-          label="Academic Progress"
-          value={metrics.academicProgress.value}
-          trend={metrics.academicProgress.trend}
-          color="green"
-        />
-        <MetricCard
-          icon={<Award className="w-6 h-6" />}
-          label="Behavior Score"
-          value={metrics.behaviorScore.value}
-          trend={metrics.behaviorScore.trend}
-          color="yellow"
-        />
-        <MetricCard
-          icon={<Clock className="w-6 h-6" />}
-          label="Upcoming Events"
-          value={metrics.upcomingEvents.value}
-          trend={metrics.upcomingEvents.trend}
-          color="purple"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Overall Grade</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{metrics?.overall_grade || 'N/A'}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Attendance Rate</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Progress value={metrics?.attendance_rate || 0} />
+              <p className="text-sm text-muted-foreground">
+                {metrics?.attendance_rate || 0}%
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Pending Assignments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{metrics?.pending_assignments || 0}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Average Score</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Progress value={metrics?.average_score || 0} />
+              <p className="text-sm text-muted-foreground">
+                {metrics?.average_score || 0}%
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Quick Actions */}
@@ -674,4 +617,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
       </Card>
     </div>
   );
-}; 
+};
+
+export default StudentDashboard; 

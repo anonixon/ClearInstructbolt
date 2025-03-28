@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Student, BehaviorRecord, AttendanceRecord, AttendanceStats, BehaviorIntervention, BehaviorStats, Parent } from '../types';
+import { User } from '@supabase/supabase-js';
 
 interface DashboardState {
   currentParent: Parent;
@@ -18,6 +19,8 @@ interface DashboardState {
   getAttendanceStats: (date: Date) => AttendanceStats;
   getBehaviorStats: (studentId: string) => BehaviorStats;
   getSelectedChild: () => Student | undefined;
+  user: User | null;
+  setUser: (user: User | null) => void;
 }
 
 // Sample data for demonstration
@@ -112,6 +115,7 @@ export const useStore = create<DashboardState>((set, get) => ({
   behaviorRecords: sampleBehaviorRecords,
   behaviorInterventions: sampleInterventions,
   attendanceRecords: sampleAttendanceRecords,
+  user: null,
   
   setSelectedChild: (childId) =>
     set((state) => ({
@@ -206,5 +210,7 @@ export const useStore = create<DashboardState>((set, get) => ({
       recentTrend: recentPoints > 0 ? 'improving' : recentPoints < 0 ? 'declining' : 'stable',
       interventionsActive: activeInterventions
     };
-  }
+  },
+  
+  setUser: (user) => set({ user }),
 }));

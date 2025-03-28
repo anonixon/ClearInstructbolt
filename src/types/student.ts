@@ -1,42 +1,30 @@
 export interface Student {
   id: string;
   name: string;
+  email: string;
   grade: string;
-  status: 'active' | 'inactive';
   attendance: number;
-  performance: number;
-  behaviorScore: string;
+  academic_progress: number;
+  behavior_score: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface StudentMetrics {
-  attendance: {
-    value: string;
-    trend: {
-      value: number;
-      isPositive: boolean;
-    };
-  };
-  academicProgress: {
-    value: string;
-    trend: {
-      value: number;
-      isPositive: boolean;
-    };
-  };
-  behaviorScore: {
-    value: string;
-    trend: {
-      value: number;
-      isPositive: boolean;
-    };
-  };
-  upcomingEvents: {
-    value: string;
-    trend: {
-      value: number;
-      isPositive: boolean;
-    };
-  };
+  overall_grade: string;
+  attendance_rate: number;
+  pending_assignments: number;
+  average_score: number;
+}
+
+export interface StudentDashboardProps {
+  studentId: string;
+}
+
+export interface PerformanceInsight {
+  type: 'success' | 'warning' | 'error';
+  title: string;
+  description: string;
+  action?: string;
+  icon?: React.ReactNode;
 } 

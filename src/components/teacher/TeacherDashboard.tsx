@@ -3,11 +3,11 @@ import { Calendar, Users, BookOpen, MessageSquare, FileText, Bell, Search } from
 import ClassOverview from './dashboard/ClassOverview';
 import StudentProgress from './dashboard/StudentProgress';
 import AttendanceManager from './dashboard/AttendanceManager';
-import AssignmentManager from './dashboard/AssignmentManager';
-import ParentCommunication from './dashboard/ParentCommunication';
-import ResourceManager from './dashboard/ResourceManager';
-import TeacherCalendar from './dashboard/TeacherCalendar';
-import NotificationPanel from './dashboard/NotificationPanel';
+import { AssignmentManager } from './dashboard/AssignmentManager';
+import { ParentCommunication } from './dashboard/ParentCommunication';
+import { ResourceManager } from './dashboard/ResourceManager';
+import { TeacherCalendar } from './dashboard/TeacherCalendar';
+import { NotificationPanel } from './dashboard/NotificationPanel';
 
 const TeacherDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
